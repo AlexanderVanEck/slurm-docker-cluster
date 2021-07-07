@@ -34,8 +34,15 @@ RUN set -ex \
        psmisc \
        bash-completion \
        vim-enhanced \
+       # slurmrestd dependencies
+       json-c-devel \
+       http-parser \
+       libyaml \
     && yum clean all \
     && rm -rf /var/cache/yum
+
+# for json-c
+ENV PKG_CONFIG_PATH=/usr/lib64/pkgconfig/:$PKG_CONFIG_PATH
     
 RUN ln -s /usr/bin/python3.4 /usr/bin/python3
 
@@ -57,6 +64,7 @@ RUN set -x \
     && git checkout tags/$SLURM_TAG \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
+        --with-http-parser=/usr/lib64 --with-yaml=/usr/lib64 \
     && make install \
     && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf.example \
     && install -D -m644 etc/slurm.conf.example /etc/slurm/slurm.conf.example \
